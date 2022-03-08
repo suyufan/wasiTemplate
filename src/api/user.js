@@ -8,6 +8,22 @@ export function login(data) {
   })
 }
 
+// export function login(data) {
+//   return request({
+//     url: 'http://1.15.106.53:8080/user/login',
+//     method: 'post',
+//     data
+//   })
+// }
+
+export function register(data) {
+  return request({
+    url: 'http://1.15.106.53:8080/user/register',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/vue-admin-template/user/info',

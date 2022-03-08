@@ -1,0 +1,22 @@
+<!-- HTML 标签内<script>内联脚本 -->
+    <div><script>alert('xss')</script></div>
+<!-- HTML 标签内<script>外链脚本 -->
+    <div><script src="xxx.js"></script></div>
+<!-- HTML 标签on...内联事件 -->
+    <img src="x" onerror="alert('xss')"/>
+<!-- src href中的javascript:协议 -->
+    <a href="javascript:alert('xss')"></a>
+    <img src="javascript:alert('xss')"/>
+<!-- style属性中的url expression -->
+    <div style="background-image: url(javascript:alert('xss'))"></div>
+    <div style="width: expression(alert('xss'));"></div>
+<script>
+    // 标签转译
+    str.replace('<','&lt')
+    str.replace('>','&gt')
+    // 输入" onclick="alert('xss')  有会出现（先将value闭合掉 再放内联事件放攻击代码）
+    // PHP中有一个内置函数.htmlspecialchars()可以将单引号，双引号以及标签闭合符号都进行过滤
+    // htmlspecialchars转义函数原理
+    
+
+</script>

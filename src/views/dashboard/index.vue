@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
+    <div class="img-back" align="center">
+      <img :src="imgUrl">
+    </div>
   </div>
 </template>
 
@@ -9,6 +11,11 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Dashboard',
+  data() {
+    return {
+      imgUrl: require('./../../assets/index.jpg')
+    }
+  },
   computed: {
     ...mapGetters([
       'name'
