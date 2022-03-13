@@ -20,8 +20,8 @@
           <el-form-item label="地点" prop="location">
             <el-input v-model="form.location"></el-input>
           </el-form-item>
-          <el-form-item label="工作面" prop="workapce">
-            <el-input v-model="form.workapce"></el-input>
+          <el-form-item label="工作面" prop="workspace">
+            <el-input v-model="form.workspace"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -46,7 +46,7 @@
         </el-table-column>
         <el-table-column align="center" label="编号" width="95">
           <template slot-scope="scope">
-            {{ scope.$index }}
+            {{ scope.row.id }}
           </template>
         </el-table-column>
         <el-table-column label="设备名" width="110" align="center">
@@ -66,7 +66,7 @@
         </el-table-column>
         <el-table-column label="工作面">
           <template slot-scope="scope">
-            {{ scope.row.workapce }}
+            {{ scope.row.workspace }}
           </template>
         </el-table-column>
       </el-table>
@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { getList } from "@/api/table";
+import { fetchList,addList,delList } from "@/api/device";
 
 export default {
   data() {
@@ -118,7 +118,7 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true;
-      getList().then((response) => {
+      fetchList().then((response) => {
         this.list = response.data.items;
         this.listLoading = false;
       });
@@ -138,6 +138,11 @@ export default {
     // 确定新增
     handleAddOk(row) {
       this.addFormVisible = false;
+      // --------------- 连接后端之后打开-----------
+      // row = JSON.stringify(row)
+      // addList(row);
+      // this.fetchData()
+      row.id = "11111111111"
       this.$message({
         type: "success",
         message: "新增成功!",
@@ -148,12 +153,13 @@ export default {
         name: "",
         department: "",
         location: "",
-        perm_group: "",
+        workspace: ""
       };
     },
     // 取消新增
     handleAddCancle(row) {
       this.addFormVisible = false;
+      this.fetchData()
       this.$message({
         type: "info",
         message: "已取消新增",
@@ -172,15 +178,24 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
-      })
-        .then(() => {
+      }).then(() => {
           const length = this.multipleSelection.length;
           const multipleSelectionArr = [];
           for (let i = 0; i < length; i++) {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
+          multipleSelectionArr.forEach(id => {
+            this.list.forEach((item, index) => {
+              if(item.id == id){
+                this.list.splice(index,1)
+              }
+            })
+          })
+         
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
+          // delList(multipleSelectionArr)
+          // this.fetchData()
           this.$message({
             type: "success",
             message: "删除成功!",

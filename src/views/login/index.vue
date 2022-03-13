@@ -75,6 +75,7 @@
 
 <script>
 import { validUsername } from "@/utils/validate";
+import AES from "../../../src/utils/AES";
 
 export default {
   name: "Login",
@@ -116,6 +117,7 @@ export default {
     $route: {
       handler: function (route) {
         this.redirect = route.query && route.query.redirect;
+        console.log("登录页面的redirect：",this.redirect);
       },
       immediate: true,
     },
@@ -135,6 +137,9 @@ export default {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
           this.loading = true;
+          const keys = AES.generatekey(16);
+          const encrypts = AES.encrypt(this.loginForm.password,'123456{saltZX}..');
+          this.loginForm.password = encrypts;
           this.$store
             .dispatch("user/login", this.loginForm)
             .then(() => {

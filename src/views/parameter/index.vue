@@ -181,6 +181,13 @@ export default {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
+          multipleSelectionArr.forEach(id => {
+            this.list.forEach((item, index) => {
+              if(item.id == id){
+                this.list.splice(index,1)
+              }
+            })
+          })
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
           this.$message({
             type: "success",

@@ -18,7 +18,7 @@ export function login(data) {
 
 export function register(data) {
   return request({
-    url: 'http://1.15.106.53:8080/user/register',
+    url: '/user/register',
     method: 'post',
     data
   })

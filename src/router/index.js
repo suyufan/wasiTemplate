@@ -144,8 +144,30 @@ export const constantRoutes = [
       {
         path: 'multi',
         name: '多因素',
+        //component: Layout,
+        //redirect: '/derivation/table/multi',
         component: () => import('@/views/multi/index'),
-        meta: { title: '多因素', icon: 'chart' }
+        meta: { title: '多因素', icon: 'chart' },
+        children: [
+          {
+            path: 'rule',
+            name: '强关联规则',
+            component: () => import('@/views/multi/rule/index'),
+            meta: { title: '强关联规则', icon: 'chart'}
+          },
+          {
+            path: 'risk',
+            name: '耦合风险值',
+            component: () => import('@/views/multi/risk/index'),
+            meta: { title: '耦合风险值', icon: 'chart'}
+          },
+          {
+            path: 'trend',
+            name: '演化趋势',
+            component: () => import('@/views/multi/trend/index'),
+            meta: { title: '演化趋势', icon: 'chart'}
+          }
+        ]
       }
     ]
   },

@@ -11,7 +11,7 @@
     >
       <el-table-column align="center" label="工作面">
         <template slot-scope="scope">
-          {{ scope.row.location }}
+          {{ scope.row.workspace }}
         </template>
       </el-table-column>
       <el-table-column label="设备名称" width="350" align="center">
@@ -19,9 +19,9 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column class-name="equipment_status" label="运行状态" width="200" align="center">
+      <el-table-column class-name="status" label="运行状态" width="200" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.equipment_status | statusFilter">{{ scope.row.equipment_status }}</el-tag>
+          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
         </template>
       </el-table-column>
     </el-table>
@@ -32,12 +32,12 @@
 import { getList } from '@/api/equipment'
 export default {
   filters: {
-    statusFilter(perm_group) {
+    statusFilter(status) {
       const statusMap = {
         warning: 'warning',
         error: 'danger'
       }
-      return statusMap[perm_group]
+      return statusMap[status]
     }
   },
   data() {

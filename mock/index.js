@@ -5,12 +5,20 @@ const user = require('./user')
 const table = require('./table')
 const equipment = require('./equipment')
 const parameter = require('./parameter')
+const device = require('./device')
+const gas = require('./gas')
+const wind = require('./wind')
+const workspace = require('./workspace')
 
 const mocks = [
   ...user,
   ...table,
   ...equipment,
   ...parameter,
+  ...device,
+  ...gas,
+  ...wind,
+  ...workspace
 ]
 
 // for front mock

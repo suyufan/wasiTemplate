@@ -10,23 +10,14 @@
       <!-- 新增弹窗 -->
       <el-dialog title="新增信息" :visible.sync="addFormVisible" center>
         <el-form :model="form" label-width="80px" :ref="form">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="form.id"></el-input>
-          </el-form-item>
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item label="部门" prop="department">
             <el-input v-model="form.department"></el-input>
           </el-form-item>
-          <el-form-item label="位置" prop="location">
-            <el-input v-model="form.location"></el-input>
-          </el-form-item>
-          <el-form-item label="权限组" prop="perm_group">
-            <el-select v-model="form.perm_group" placeholder="请选择权限组">
-              <el-option label="published" value="published"></el-option>
-              <el-option label="admin" value="admin"></el-option>
-            </el-select>
+          <el-form-item label="工作区" prop="workspace">
+            <el-input v-model="form.workspace"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -50,7 +41,7 @@
         <el-table-column type="selection" width="55" label="全选"> </el-table-column>
         <el-table-column align="center" label="ID" width="95">
           <template slot-scope="scope">
-            {{ scope.$index }}
+            {{ scope.row.id }}
           </template>
         </el-table-column>
         <el-table-column label="姓名" width="110" align="center">
@@ -63,9 +54,9 @@
             <span>{{ scope.row.department }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="位置">
+        <el-table-column label="工作区">
           <template slot-scope="scope">
-            {{ scope.row.location }}
+            {{ scope.row.workspace }}
           </template>
         </el-table-column>
         <el-table-column
@@ -75,8 +66,8 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.perm_group | statusFilter">{{
-              scope.row.perm_group
+            <el-tag :type="scope.row.permission | statusFilter">{{
+              scope.row.permission
             }}</el-tag>
           </template>
         </el-table-column>
@@ -106,12 +97,12 @@
                 <el-form-item label="部门" prop="department">
                   <el-input v-model="editData.department"></el-input>
                 </el-form-item>
-                <el-form-item label="位置" prop="location">
-                  <el-input v-model="editData.location"></el-input>
+                <el-form-item label="工作区" prop="workspace">
+                  <el-input v-model="editData.workspace"></el-input>
                 </el-form-item>
-                <el-form-item label="权限组" prop="perm_group">
+                <el-form-item label="权限组" prop="permission">
                   <el-select
-                    v-model="editData.perm_group"
+                    v-model="editData.permission"
                     placeholder="请选择权限组"
                   >
                     <el-option label="published" value="published"></el-option>
@@ -159,16 +150,16 @@
 </template>
 
 <script>
-import { getList } from "@/api/table";
+import { getList, addList, updateList, delList } from "@/api/table";
 
 export default {
   filters: {
-    statusFilter(perm_group) {
+    statusFilter(permission) {
       const statusMap = {
         published: "success",
         admin: "danger",
       };
-      return statusMap[perm_group];
+      return statusMap[permission];
     },
   },
   data() {
@@ -182,8 +173,8 @@ export default {
         id: "",
         name: "",
         department: "",
-        location: "",
-        perm_group: "",
+        workspace: "",
+        permission: "",
       },
       page: 1, // 当前页号
       pageSize: 10, // 每页的记录数
@@ -220,17 +211,22 @@ export default {
     // 确定新增
     handleAddOk(row) {
       this.addFormVisible = false;
+      // row = JSON.stringify(row);
+      // addList(row);
+      // this.fetchData();
       this.$message({
         type: "success",
         message: "新增成功!",
       });
+      row.id="1111111";
+      row.permission = "admin";
       this.list.push(row);
       this.form = {
         id: "",
         name: "",
         department: "",
-        location: "",
-        perm_group: "",
+        workspace: "",
+        permission: "",
       };
     },
     // 取消新增
@@ -244,8 +240,8 @@ export default {
         id: "",
         name: "",
         department: "",
-        location: "",
-        perm_group: "",
+        workspace: "",
+        permission: "",
       };
     },
 
@@ -262,7 +258,16 @@ export default {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
+          multipleSelectionArr.forEach(id => {
+            this.list.forEach((item, index) => {
+              if(item.id == id){
+                this.list.splice(index,1)
+              }
+            })
+          })
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
+          // delList(multipleSelectionArr);
+          // this.fetchData();
           this.$message({
             type: "success",
             message: "删除成功!",
@@ -297,6 +302,8 @@ export default {
     // 确定编辑
     handleOk(row) {
       //------------- 编辑信息，传递编辑后的row给后端 ------------------
+      // updateList(row);
+      // this.fetchData()
       this.dialogFormVisible = false;
       this.$message({
         type: "success",
@@ -313,6 +320,7 @@ export default {
       //----------------- 不传信息 不调用后端接口 直接关闭弹窗-----------
       //
       // console.log("取消编辑的row",row);
+      this.fetchData();
       this.$message({
         type: "info",
         message: "已取消编辑",

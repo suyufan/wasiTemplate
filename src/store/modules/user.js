@@ -44,9 +44,9 @@ const actions = {
   },
 
   // user register
-  register({ commit, state }) {
+  register({ commit }) {
     return new Promise((resolve, reject) => {
-      register(state.token).then(() => {
+      register().then(() => {
         // removeToken() // must remove  token  first
         // resetRouter()
         commit('RESET_STATE')

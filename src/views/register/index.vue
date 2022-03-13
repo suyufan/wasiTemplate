@@ -19,8 +19,23 @@
         <el-input
           ref="username"
           v-model="registerForm.username"
-          placeholder="Username"
+          placeholder="登录名"
           name="username"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+
+      <el-form-item prop="nickname">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="nickname"
+          v-model="registerForm.nickname"
+          placeholder="昵称"
+          name="nickname"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -61,7 +76,7 @@
         :loading="loading"
         type="success"
         style="width: 100%; margin-bottom: 30px; margin-left: 0px"
-        @click.native.prevent="handleLogin"
+        @click.native.prevent="handleRegister(registerForm)"
         >确定注册</el-button
       >
 
@@ -75,6 +90,8 @@
 
 <script>
 import { validUsername } from "@/utils/validate";
+import { register } from "@/api/user";
+import AES from "../../../src/utils/AES";
 
 export default {
   name: "Register",
@@ -96,6 +113,7 @@ export default {
     return {
       registerForm: {
         username: "",
+        nickname: "",
         password: "",
       },
       registerRules: {
@@ -130,6 +148,19 @@ export default {
         this.$refs.password.focus();
       });
     },
+
+    handleRegister(data) {
+      const keys = AES.generatekey(16);
+      const encrypts = AES.encrypt(data.password,'123456{saltZX}..');
+      data.password = encrypts;
+      data = JSON.stringify(data);
+      register(data);
+      this.$message({
+        type: "success",
+        message: "注册成功!",
+      });
+    },
+
     handleLogin() {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {

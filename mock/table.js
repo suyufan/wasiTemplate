@@ -7,14 +7,14 @@ const data = Mock.mock({
     // display_time: '@datetime',
     // pageviews: '@integer(300, 5000)',
     department: '@sentence(5, 10)',
-    location: '@sentence(5, 10)',
-    'perm_group|1': ['published', 'admin']
+    workspace: '@sentence(5, 10)',
+    'permission|1': ['published', 'admin']
   }]
 })
 
 module.exports = [
   {
-    url: '/vue-admin-template/table/list/stuff',
+    url: '/stuff/get',
     type: 'get',
     response: config => {
       const items = data.items
