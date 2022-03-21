@@ -5,16 +5,20 @@ import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
-  // withCredentials: true, // send cookies when cross-domain requests
+  // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  withCredentials: true, // send cookies when cross-domain requests
+  baseURL: 'http://1.15.106.53:8080',
   timeout: 5000 // request timeout
+  
 })
+let b = service.defaults.headers.common
+b['Access-Control-Allow-Origin'] = '*'
+console.log("---service---",service.defaults.headers.common);
 
 // request interceptor
 service.interceptors.request.use(
   config => {
     // do something before request is sent
-
     if (store.getters.token) {
       // let each request carry token
       // ['X-Token'] is a custom headers key
@@ -45,13 +49,27 @@ service.interceptors.response.use(
   response => {
     const res = response.data
 
+    console.log("----request-response",response);
+
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    // res.data 有 status 时，要response.status==200且res.data.status=="success"
+    // res.data 没有　status　时，要response.status==200
+    
+    if (response.status !== 200 || res.status ? res.status !== "success" : false) {
       Message({
         message: res.message || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
+
+      //如果username或password错误
+      if(res.status == "fail") {
+        Message({
+          message: res.reason || 'Error',
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {

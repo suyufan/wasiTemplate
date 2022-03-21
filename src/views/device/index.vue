@@ -51,7 +51,7 @@
         </el-table-column>
         <el-table-column label="设备名" width="110" align="center">
           <template slot-scope="scope">
-            {{ scope.row.name }}
+            {{ scope.row.machine_name }}
           </template>
         </el-table-column>
         <el-table-column label="部门">
@@ -119,7 +119,7 @@ export default {
     fetchData() {
       this.listLoading = true;
       fetchList().then((response) => {
-        this.list = response.data.items;
+        this.list = response
         this.listLoading = false;
       });
     },
@@ -136,13 +136,11 @@ export default {
       this.addFormVisible = true;
     },
     // 确定新增
-    handleAddOk(row) {
+    async handleAddOk(row) {
       this.addFormVisible = false;
       // --------------- 连接后端之后打开-----------
-      // row = JSON.stringify(row)
-      // addList(row);
-      // this.fetchData()
-      row.id = "11111111111"
+      await addList(row);
+      this.fetchData();
       this.$message({
         type: "success",
         message: "新增成功!",
@@ -169,7 +167,6 @@ export default {
         name: "",
         department: "",
         location: "",
-        perm_group: "",
       };
     },
 
@@ -185,17 +182,18 @@ export default {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
-          multipleSelectionArr.forEach(id => {
-            this.list.forEach((item, index) => {
-              if(item.id == id){
-                this.list.splice(index,1)
-              }
-            })
-          })
+          // ----- 前端处理 ------
+          // multipleSelectionArr.forEach(id => {
+          //   this.list.forEach((item, index) => {
+          //     if(item.id == id){
+          //       this.list.splice(index,1)
+          //     }
+          //   })
+          // })
          
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
-          // delList(multipleSelectionArr)
-          // this.fetchData()
+          delList(multipleSelectionArr)
+          this.fetchData();
           this.$message({
             type: "success",
             message: "删除成功!",

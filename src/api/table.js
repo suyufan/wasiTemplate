@@ -8,26 +8,26 @@ export function getList(params) {
   })
 }
 
-export function addList(data) {
+export function addList(query) {
   return request({
     url: '/stuff/add',
     method: 'post',
-    data
+    data: query
   })
 }
 
-export function updateList(data) {
+export function updateList(query) {
   return request({
     url: '/stuff/change',
     method: 'post',
-    data
+    data: query
   })
 }
 
-export function delList(data) {
+export function delList(query) {
   return request({
     url: '/stuff/delete',
     method: 'post',
-    data
+    data: query
   })
 }

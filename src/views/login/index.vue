@@ -117,10 +117,16 @@ export default {
     $route: {
       handler: function (route) {
         this.redirect = route.query && route.query.redirect;
-        console.log("登录页面的redirect：",this.redirect);
       },
       immediate: true,
     },
+  },
+  mounted() {
+    if (this.loginForm.username === "") {
+      this.$refs.username.focus();
+    } else if (this.loginForm.password === "") {
+      this.$refs.password.focus();
+    }
   },
   methods: {
     showPwd() {
@@ -138,8 +144,10 @@ export default {
         if (valid) {
           this.loading = true;
           const keys = AES.generatekey(16);
+          //----------AES密码加密------------
           const encrypts = AES.encrypt(this.loginForm.password,'123456{saltZX}..');
           this.loginForm.password = encrypts;
+          console.log("this.loginForm", this.loginForm);
           this.$store
             .dispatch("user/login", this.loginForm)
             .then(() => {
@@ -155,10 +163,9 @@ export default {
         }
       });
     },
-    register() {
+    async register() {
       this.loadingRegister = true;
-      console.log("注册方法点击了", this.loadingRegister);
-      this.$store.dispatch("user/register");
+      await this.$router.push({ path: "/register" });
       this.loadingRegister = false;
       // this.$router.push()
     },

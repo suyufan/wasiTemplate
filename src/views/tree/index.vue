@@ -213,8 +213,8 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        
-        <br/>
+
+        <br />
         <el-form-item style="margin-left: 40%">
           <el-button type="primary" @click="submitForm('form', form)"
             >确定</el-button
@@ -236,38 +236,38 @@
       >
         <el-table-column label="时间" prop="time" align="center">
         </el-table-column>
-        <el-table-column label="矿井" prop="name" align="center">
+        <el-table-column label="矿井" prop="area" align="center">
         </el-table-column>
-        <el-table-column label="危险值" prop="risk_value" align="center">
+        <el-table-column label="危险值" prop="value" align="center">
         </el-table-column>
         <el-table-column
           label="瓦斯爆炸事故危险度"
-          prop="risk_level"
+          prop="degree"
           align="center"
         >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.risk_level | statusFilter" effect="dark">{{
-              scope.row.risk_level
+            <el-tag :type="scope.row.degree | statusFilter" effect="dark">{{
+              scope.row.degree
             }}</el-tag>
           </template>
         </el-table-column>
       </el-table>
     </el-row>
-
   </div>
 </template>
 
 <script>
+import { getList, addList } from "@/api/area";
 export default {
   filters: {
-    statusFilter(risk_level) {
+    statusFilter(degree) {
       const statusMap = {
         稍有危险: "",
         一般危险: "info",
         比较危险: "warning",
         很危险: "danger",
       };
-      return statusMap[risk_level];
+      return statusMap[degree];
     },
   },
   data() {
@@ -331,24 +331,32 @@ export default {
       tableData: [],
       risk_value: 0,
       risk_level: "",
+      listLoading: true,
     };
   },
-
+  created() {
+    this.fetchData();
+  },
   methods: {
+    fetchData() {
+      this.listLoading = true;
+      getList().then((response) => {
+        this.tableData = response;
+        this.listLoading = false;
+      });
+    },
     // 确定
     submitForm(formName, val) {
-      console.log("formName", formName);
-      console.log("val", val);
       this.$refs[formName].validate((valid) => {
         if (valid) {
-           // 危险值risk_value
-           this.risk_value = 0
-          for (let i in val) {            
-              this.risk_value += val[i] * 1;           
+          // 危险值risk_value
+          this.risk_value = 0;
+          for (let i in val) {
+            this.risk_value += val[i] * 1;
           }
-          this.risk_value -= val.c
-          this.risk_value -= val.site
-          this.risk_value = this.risk_value * val.c
+          this.risk_value -= val.c;
+          this.risk_value -= val.site;
+          this.risk_value = this.risk_value * val.c;
           // 危险程度risk_level
           if (this.risk_value > 29) {
             this.risk_level = "很危险";
@@ -425,13 +433,15 @@ export default {
               seconds;
             return currentFormatDate;
           }
-
-          this.tableData.push({
+          let arr = {
             time: getTime(),
-            name: val.site+"#矿井",
-            risk_value: this.risk_value,
-            risk_level: this.risk_level,
-          });
+            area: val.site + "#矿井",
+            value: this.risk_value,
+            degree: this.risk_level,
+          };
+          // this.tableData.push(arr);
+          addList(arr);
+          this.fetchData();
           console.log("tableData", this.tableData);
         } else {
           console.log("error submit!!");
@@ -442,7 +452,7 @@ export default {
 
     // 重置
     resetForm(formName) {
-      this.risk_value = 0
+      this.risk_value = 0;
       this.$refs[formName].resetFields();
     },
   },

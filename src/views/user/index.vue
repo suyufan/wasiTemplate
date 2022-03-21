@@ -1,20 +1,57 @@
 <template>
   <div class="app-container">
     <el-row>
-      <el-select
-        v-model="value"
-        placeholder="请选择工作面"
-        @change="handleChange(value)"
-      >
-      
-        <el-option
-          v-for="item in workOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
-      </el-select>
-&nbsp;&nbsp;
+      <el-form :inline="true">
+        <el-form-item label="工作面">
+          <el-select
+            v-model="workspace"
+            placeholder="请选择工作面"
+            @change="handleChangeWorkspace(workspace)"
+          >
+            <el-option
+              v-for="item in workOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        &nbsp;&nbsp;
+        <el-form-item label="时间">
+          <el-date-picker
+            type="date"
+            placeholder="选择日期"
+            v-model="time"
+            style="width: 100%"
+            @change="handleChangeTime(time)"
+          ></el-date-picker>
+        </el-form-item>
+        &nbsp;&nbsp;
+        <el-form-item label="班次">
+          <el-select
+            v-model="shift"
+            placeholder="请选择班次"
+            @change="handleChangeShift(shift)"
+          >
+            <el-option
+              v-for="item in shiftOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        &nbsp;&nbsp;
+        <el-form-item label="检查人">
+          <el-input
+            v-model="people"
+            placeholder="请输入检查人"
+            @change="handleChangePerson(people)"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+    </el-row>
+    <el-row>
       <el-cascader
         placeholder="请选择指标"
         :options="options"
@@ -41,6 +78,14 @@
         fit
         highlight-current-row
       >
+        <el-table-column label="工作面" prop="workspace" align="center">
+        </el-table-column>
+        <el-table-column label="时间" prop="time" align="center">
+        </el-table-column>
+        <el-table-column label="班次" prop="shift" align="center">
+        </el-table-column>
+        <el-table-column label="检查人" prop="people" align="center">
+        </el-table-column>
         <el-table-column label="指标" prop="label" align="center">
         </el-table-column>
         <el-table-column label="风险值" prop="risk_value" align="center">
@@ -59,6 +104,7 @@
 
 <script>
 import { getList } from "@/api/workspace";
+import { getMonitorList } from "@/api/usermonitor";
 
 export default {
   filters: {
@@ -76,10 +122,21 @@ export default {
     return {
       props: { multiple: true },
       workOptions: [],
-      workspace: {
-        workspace: "",
-      },
-      value: '',
+      timeOptions: [
+        {
+          value: "",
+          label: "",
+        },
+      ],
+      shiftOptions: [
+        { value: "早班", label: "早班" },
+        { value: "中班", label: "中班" },
+        { value: "晚班", label: "晚班" },
+      ],
+      value: "",
+      time: "",
+      shift: "",
+      people: "",
       options: [
         {
           value: 1,
@@ -705,6 +762,7 @@ export default {
       inputData: "",
       search: [],
       tableData: [],
+      workspace: "",
     };
   },
   created() {
@@ -713,21 +771,55 @@ export default {
   methods: {
     fetchData() {
       getList().then((response) => {
-        response.data.forEach((item) => {
-          this.workOptions.push({ value: item.id, label: item.name });
+        response.forEach((item) => {
+          this.workOptions.push({ value: item.name, label: item.name });
         });
       });
     },
     // 工作面变化
-    handleChange(value) {
-      this.workspace.workspace = value;
-      console.log("工作面选择",value);
+    handleChangeWorkspace(value) {
+      this.workspace = value;
       //------------之后要将工作面传给后端-----------
       // fetchList(JSON.stringify(this.workspace)).then((response) => {
       //   response.data;
       // });
     },
-    
+    // 时间选择
+    handleChangeTime(value) {
+      this.time = this.dateFormat("YYYY-mm-dd HH:MM:SS", value);
+    },
+    // 班次选择
+    handleChangeShift(value) {
+      this.shift = value;
+    },
+    // 人员输入
+    handleChangePerson(value) {
+      this.people = value;
+    },
+    // 时间格式化
+    dateFormat(fmt, date) {
+      let ret;
+      let opt = {
+        "Y+": date.getFullYear().toString(), // 年
+        "m+": (date.getMonth() + 1).toString(), // 月
+        "d+": date.getDate().toString(), // 日
+        "H+": date.getHours().toString(), // 时
+        "M+": date.getMinutes().toString(), // 分
+        "S+": date.getSeconds().toString(), // 秒
+        // 有其他格式化字符需求可以继续添加，必须转化成字符串
+      };
+      for (let k in opt) {
+        ret = new RegExp("(" + k + ")").exec(fmt);
+        if (ret) {
+          fmt = fmt.replace(
+            ret[1],
+            ret[1].length == 1 ? opt[k] : opt[k].padStart(ret[1].length, "0")
+          );
+        }
+      }
+      return fmt;
+    },
+
     // 级联筛选
     handleChangeWork(value) {
       console.log("选中的", value);
@@ -749,7 +841,27 @@ export default {
         }
       });
 
+      this.tableData.forEach((item) => {
+        item["workspace"] = this.workspace;
+        item["time"] = this.time;
+        item["shift"] = this.shift;
+        item["people"] = this.people;
+      });
       //-------如果this.tableData 的风险等级是较大或重大 传给后端进行保存------
+      console.log("this.tableData", this.tableData);
+      let arrdataArr = [];
+      this.tableData.forEach((item) => {
+        let arrdata = {};
+        arrdata.risk_value = item.risk_value;
+        arrdata.degree = item.risk_level;
+        arrdata.key_id = item.label;
+        arrdata.workspace = item.workspace;
+        arrdata.people = item.people;
+        arrdata.shift = item.shift;
+        arrdata.time = item.time;
+        arrdataArr.push(arrdata);
+      });
+      getMonitorList(arrdataArr);
     },
   },
 };

@@ -190,14 +190,23 @@ export default {
   created() {
     this.fetchData();
   },
+  watch: {
+    list: () => {
+      console.log("监听器执行了");
+      getList().then((response) => {
+        list = response
+      })
+    }
+  },
   methods: {
     fetchData() {
       this.listLoading = true;
       getList().then((response) => {
-        this.list = response.data.items;
+        this.list = response
         this.listLoading = false;
       });
     },
+
     handleSizeChange(val) {
       this.pageSize = val
     },
@@ -209,18 +218,15 @@ export default {
       this.addFormVisible = true;
     },
     // 确定新增
-    handleAddOk(row) {
+    async handleAddOk(row) {
+      await addList(row);
       this.addFormVisible = false;
-      // row = JSON.stringify(row);
-      // addList(row);
-      // this.fetchData();
       this.$message({
         type: "success",
         message: "新增成功!",
       });
-      row.id="1111111";
-      row.permission = "admin";
-      this.list.push(row);
+      this.fetchData();
+      // this.list.push(row);
       this.form = {
         id: "",
         name: "",
@@ -258,16 +264,19 @@ export default {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
-          multipleSelectionArr.forEach(id => {
-            this.list.forEach((item, index) => {
-              if(item.id == id){
-                this.list.splice(index,1)
-              }
-            })
-          })
+          // --------多选删除 前端操作 ------
+          // multipleSelectionArr.forEach(id => {
+          //   this.list.forEach((item, index) => {
+          //     if(item.id == id){
+          //       this.list.splice(index,1)
+          //     }
+          //   })
+          // })
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
-          // delList(multipleSelectionArr);
-          // this.fetchData();
+          
+          delList(multipleSelectionArr);
+          setTimeout(this.fetchData(),3000);
+          
           this.$message({
             type: "success",
             message: "删除成功!",
@@ -300,26 +309,20 @@ export default {
       this.editData = row;
     },
     // 确定编辑
-    handleOk(row) {
+    async handleOk(row) {
       //------------- 编辑信息，传递编辑后的row给后端 ------------------
-      // updateList(row);
-      // this.fetchData()
+      await updateList(row);
+      this.fetchData();
       this.dialogFormVisible = false;
       this.$message({
         type: "success",
         message: "编辑成功!",
       });
-      console.log("确定编辑的row",row);
     },
     // 取消编辑
     handleCancle(row) {
       row = this.editData
-      console.log("取消编辑的row",row);
       this.dialogFormVisible = false;
-      // ----------------------------- 取消编辑 有问题----------------
-      //----------------- 不传信息 不调用后端接口 直接关闭弹窗-----------
-      //
-      // console.log("取消编辑的row",row);
       this.fetchData();
       this.$message({
         type: "info",
@@ -332,9 +335,9 @@ export default {
         cancelButtonText: "取消",
         type: "warning",
       })
-        .then(() => {
-          this.list.splice(index, 1);
-          console.log("单次删除的index", index);
+        .then(() => {          
+          delList([row.id]);
+          this.fetchData();
           this.$message({
             type: "success",
             message: "删除成功!",

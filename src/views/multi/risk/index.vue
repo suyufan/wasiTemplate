@@ -9,32 +9,110 @@
 var echarts = require("echarts");
 // 引入折线图
 require("echarts/lib/chart/line");
+import { getList } from "@/api/multi";
 export default {
- mounted() {
-    this.init();
-    // this.initCharts();
+  data() {
+    return {
+      x: [],
+      y: [],
+      xsp: [],
+    };
+  },
+  created() {},
+  mounted() {
+    this.fetchData();
   },
   methods: {
-    init() {
-      //2.初始化
-      this.chart = echarts.init(this.$refs.chart);
-      //3.配置数据
-      let option = {
-        title: {
-          text: '耦合风险图',
-          show: true,
-          left: 'center'
-        },
-        xAxis: {
-          type: "category",
-          data: ["3.9-1", "3.9-2", "3.9-3", "3.10-4", "3.10-5", "3.10-6", "3.11-7", "3.11-8", "3.11-9", "3.12-10", "3.12-11", "3.12-12"],
-        }, //X轴
-        yAxis: { type: "value" }, //Y轴
-        series: [{ data: [7, 10, 14, 9, 11, 17, 13, 20, 23, 18, 15,7], type: "line" }], //配置项
-      };
-      // 4.传入数据
-      this.chart.setOption(option);
+    async fetchData() {
+      await getList().then((response) => {
+        response.forEach((item) => {
+          this.x.push(item.time);
+          this.y.push(item.value);
+        });
+        this.x.forEach((i) => {
+          this.xsp.push(i.substring(5, 10));
+        });
+        //2.初始化
+        this.chart = echarts.init(this.$refs.chart);
+        //3.配置数据
+        let option = {
+          title: {
+            text: "耦合风险图",
+            show: true,
+            left: "center",
+          },
+          tooltip: {
+            trigger: "axis",
+          },
+          xAxis: {
+            type: "category",
+            data: this.xsp,
+          }, //X轴
+          yAxis: {
+            axisLine: { show: true },
+            axisTick: { show: true },
+            type: "value",
+          }, //Y轴
+          series: [
+            {
+              data: this.y,
+              type: "line",
+              markArea: {
+                //标记区域
+                data: [
+                  [
+                    {
+                      yAxis: "0",
+                      itemStyle: {
+                        color: "#ADD8E6",
+                      },
+                    },
+                    {
+                      yAxis: "9",
+                    },
+                  ],
+                  [
+                    {
+                      yAxis: "9",
+                      itemStyle: {
+                        color: "#FFFACD",
+                      },
+                    },
+                    {
+                      yAxis: "15",
+                    },
+                  ],
+                  [
+                    {
+                      yAxis: "15",
+                      itemStyle: {
+                        color: "#F5DEB3",
+                      },
+                    },
+                    {
+                      yAxis: "20",
+                    },
+                  ],
+                  [
+                    {
+                      yAxis: "20",
+                      itemStyle: {
+                        color: " #FFA07A",
+                      },
+                    },
+                    {
+                      yAxis: "100",
+                    },
+                  ],
+                ],
+              },
+            },
+          ], //配置项
+        };
+        // 4.传入数据
+        this.chart.setOption(option);
+      });
     },
   },
-}
+};
 </script>

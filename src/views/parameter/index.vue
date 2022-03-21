@@ -10,20 +10,17 @@
       <!-- 新增弹窗 -->
       <el-dialog title="新增参数" :visible.sync="addFormVisible" center>
         <el-form :model="form" label-width="80px" :ref="form">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="form.id"></el-input>
-          </el-form-item>
-          <el-form-item label="名称" prop="name">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>
           <el-form-item label="工作面" prop="location">
-            <el-input v-model="form.location"></el-input>
+            <el-input v-model="form.workspace"></el-input>
           </el-form-item>
-          <el-form-item label="上域值" prop="department">
-            <el-input v-model="form.max"></el-input>
+          <el-form-item label="监测类型" prop="location">
+            <el-input v-model="form.type"></el-input>
           </el-form-item>
-          <el-form-item label="下域值" prop="department">
-            <el-input v-model="form.min"></el-input>
+          <el-form-item label="低域值" prop="department">
+            <el-input v-model="form.lower_limit"></el-input>
+          </el-form-item>
+          <el-form-item label="高域值" prop="department">
+            <el-input v-model="form.upper_limit"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -48,27 +45,32 @@
         </el-table-column>
         <el-table-column align="center" label="编号" width="95">
           <template slot-scope="scope">
-            {{ scope.$index }}
-          </template>
-        </el-table-column>
-        <el-table-column label="名称" width="110" align="center">
-          <template slot-scope="scope">
-            {{ scope.row.name }}
+            {{ scope.row.id }}
           </template>
         </el-table-column>
         <el-table-column label="工作面">
           <template slot-scope="scope">
-            <span>{{ scope.row.location }}</span>
+            <span>{{ scope.row.workspace }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="上域值">
+        <el-table-column label="监测类型">
           <template slot-scope="scope">
-            {{ scope.row.max }}
+            <span>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="下域值">
+        <el-table-column label="低域值">
           <template slot-scope="scope">
-            {{ scope.row.min }}
+            {{ scope.row.lower_limit }}
+          </template>
+        </el-table-column>
+        <el-table-column label="高域值">
+          <template slot-scope="scope">
+            {{ scope.row.upper_limit }}
+          </template>
+        </el-table-column>
+        <el-table-column label="limit_type">
+          <template slot-scope="scope">
+            {{ scope.row.limit_type }}
           </template>
         </el-table-column>
       </el-table>
@@ -94,7 +96,7 @@
 </template>
 
 <script>
-import { getList } from "@/api/parameter";
+import { getList, addList, delList, updateList } from "@/api/parameter";
 
 export default {
   data() {
@@ -106,11 +108,10 @@ export default {
       addFormVisible: false,
       multipleSelection: [], //多选的数据
       form: {
-        id: "",
-        name: "",
-        location: "",
-        max: "",
-        min: "",
+        workspace: "",
+        type: "",
+        lower_limit: "",
+        upper_limit: ""
       },
     };
   },
@@ -121,7 +122,7 @@ export default {
     fetchData() {
       this.listLoading = true;
       getList().then((response) => {
-        this.list = response.data.items;
+        this.list = response;
         this.listLoading = false;
       });
     },
@@ -137,19 +138,21 @@ export default {
       this.addFormVisible = true;
     },
     // 确定新增
-    handleAddOk(row) {
+    async handleAddOk(row) {
+      await addList(row);
+      this.fetchData();
       this.addFormVisible = false;
       this.$message({
         type: "success",
         message: "新增成功!",
       });
-      this.list.push(row);
+      // this.list.push(row);
+      
       this.form = {
-        id: "",
-        name: "",
-        department: "",
-        location: "",
-        perm_group: "",
+        workspace: "",
+        type: "",
+        lower_limit: "",
+        upper_limit: ""
       };
     },
     // 取消新增
@@ -160,11 +163,10 @@ export default {
         message: "已取消新增",
       });
       this.form = {
-        id: "",
-        name: "",
-        department: "",
-        location: "",
-        perm_group: "",
+        workspace: "",
+        type: "",
+        lower_limit: "",
+        upper_limit: ""
       };
     },
 
@@ -181,14 +183,10 @@ export default {
             // console.log("多选删除的index", this.multipleSelection[i].id);
             multipleSelectionArr.push(this.multipleSelection[i].id);
           }
-          multipleSelectionArr.forEach(id => {
-            this.list.forEach((item, index) => {
-              if(item.id == id){
-                this.list.splice(index,1)
-              }
-            })
-          })
+          
           //----------------- 多选删除 传递id数组给后端进行操作 ------------
+          delList(multipleSelectionArr);
+          this.fetchData();
           this.$message({
             type: "success",
             message: "删除成功!",

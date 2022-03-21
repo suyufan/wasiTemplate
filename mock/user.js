@@ -26,11 +26,13 @@ const users = {
 module.exports = [
   // user login
   {
-    url: '/vue-admin-template/user/login',
+    url: 'user/login',
     type: 'post',
     response: config => {
-      const { username } = config.body
-      const token = tokens[username]
+      // const { username } = config.body
+      // const token = tokens[username]
+console.log("----user.js中的config----",config);
+      const { token } = config.body
 
       // mock error
       if (!token) {
@@ -49,13 +51,15 @@ module.exports = [
 
   // get user info
   {
-    url: '/vue-admin-template/user/info\.*',
+    url: 'user/info\.*',
     type: 'get',
     response: config => {
-      const { token } = config.query
-      const info = users[token]
+      // const { token } = config.query
+      // const info = users[token]
+      const info = users['admin-token']
+console.log("-----user.js中的info",info);
 
-      // mock error
+     // mock error
       if (!info) {
         return {
           code: 50008,
@@ -72,7 +76,7 @@ module.exports = [
 
   // user logout
   {
-    url: '/vue-admin-template/user/logout',
+    url: 'user/logout',
     type: 'post',
     response: _ => {
       return {

@@ -129,14 +129,7 @@ export default {
       redirect: undefined,
     };
   },
-  watch: {
-    $route: {
-      handler: function (route) {
-        this.redirect = route.query && route.query.redirect;
-      },
-      immediate: true,
-    },
-  },
+  
   methods: {
     showPwd() {
       if (this.passwordType === "password") {
@@ -153,7 +146,7 @@ export default {
       const keys = AES.generatekey(16);
       const encrypts = AES.encrypt(data.password,'123456{saltZX}..');
       data.password = encrypts;
-      data = JSON.stringify(data);
+      console.log("---handleRegister--data--",data);
       register(data);
       this.$message({
         type: "success",
@@ -162,23 +155,7 @@ export default {
     },
 
     handleLogin() {
-      this.$refs.registerForm.validate((valid) => {
-        if (valid) {
-          this.loading = true;
-          this.$store
-            .dispatch("user/register", this.registerForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || "/" });
-              this.loading = false;
-            })
-            .catch(() => {
-              this.loading = false;
-            });
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+      this.$router.push({ path: '/login' })
     },
   },
 };

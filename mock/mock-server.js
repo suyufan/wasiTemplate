@@ -50,6 +50,10 @@ module.exports = app => {
   app.use(bodyParser.urlencoded({
     extended: true
   }))
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '');
+    next();
+  });
 
   const mockRoutes = registerRoutes(app)
   var mockRoutesLength = mockRoutes.mockRoutesLength

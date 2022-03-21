@@ -2,9 +2,8 @@ import request from '@/utils/request'
 
 export function getList(params) {
   return request({
-    url: '/monitor/single',
+    url: '/monitor/multi',
     method: 'get',
     params
   })
 }
-

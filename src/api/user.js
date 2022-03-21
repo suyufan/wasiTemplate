@@ -1,40 +1,26 @@
 import request from '@/utils/request'
 
 export function login(data) {
+  console.log("---api-data---",data);
   return request({
-    url: '/vue-admin-template/user/login',
+    url: 'user/login',
     method: 'post',
     data
   })
 }
-
-// export function login(data) {
-//   return request({
-//     url: 'http://1.15.106.53:8080/user/login',
-//     method: 'post',
-//     data
-//   })
-// }
 
 export function register(data) {
+  console.log("----api-register---data",data);
   return request({
-    url: '/user/register',
+    url: 'user/register',
     method: 'post',
     data
-  })
-}
-
-export function getInfo(token) {
-  return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
   })
 }
 
 export function logout() {
   return request({
-    url: '/vue-admin-template/user/logout',
+    url: '/user/logout',
     method: 'post'
   })
 }
