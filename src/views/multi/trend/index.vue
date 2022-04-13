@@ -25,12 +25,13 @@ export default {
     async fetchData() {
       await getList().then((response) => {
         response.forEach((item) => {
-          this.x.push(item.time);
-          this.y.push(item.value);
+          this.x.push(item.time)
+          this.y.push(item.value/100);
         });
-        this.x.forEach((i) => {
-          this.xsp.push(i.substring(5, 10));
-        });
+        // this.x.forEach((i) => {
+        //   this.xsp.push(i.substring(5, 10));
+        // });
+        this.xsp = ["0","1","2","3","4","5","6","7","8","9","10"]
         //2.初始化
         this.chart = echarts.init(this.$refs.chart);
         //3.配置数据
@@ -42,6 +43,10 @@ export default {
           },
           tooltip: {
             trigger: "axis",
+          },
+          legend: {
+            data: ["系统瓦斯爆炸风险水平","干预之后的风险水平"],
+            bottom: 1,
           },
           xAxis: {
             type: "category",
@@ -55,6 +60,7 @@ export default {
           }, //Y轴
           series: [
             {
+              name: "系统瓦斯爆炸风险水平",
               data: this.y,
               type: "line",
               markArea: {
@@ -106,6 +112,11 @@ export default {
                   ],
                 ],
               },
+            },
+             {
+              name: "干预之后的风险水平",
+              data: ["6","6.6","7","6.3","6.5","7.2","7.4","8","9","10.3","12"],
+              type: "line",
             },
           ], //配置项
         };

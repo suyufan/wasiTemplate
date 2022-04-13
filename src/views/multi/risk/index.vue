@@ -27,11 +27,12 @@ export default {
       await getList().then((response) => {
         response.forEach((item) => {
           this.x.push(item.time);
-          this.y.push(item.value);
+          this.y.push(item.value/100);
         });
-        this.x.forEach((i) => {
-          this.xsp.push(i.substring(5, 10));
-        });
+        // this.x.forEach((i) => {
+        //   this.xsp.push(i.substring(5, 10));
+        // });
+         this.xsp = ["0","1","2","3","4","5","6","7","8","9","10"]
         //2.初始化
         this.chart = echarts.init(this.$refs.chart);
         //3.配置数据
