@@ -223,9 +223,12 @@
         </el-form-item>
       </el-form>
     </el-row>
-    <el-row
-      ><p><br /></p
-    ></el-row>
+    <el-row style="float: right"
+      ><el-button type="danger" round size="medium" @click="handleMultipleDel()"
+        >批量删除</el-button
+      ></el-row
+    >
+    <el-row><p><br /></p></el-row>
     <el-row>
       <el-table
         :data="tableData"
@@ -233,7 +236,10 @@
         border
         fit
         highlight-current-row
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="55" label="全选">
+        </el-table-column>
         <el-table-column label="时间" prop="time" align="center">
         </el-table-column>
         <el-table-column label="矿井" prop="area" align="center">
@@ -344,6 +350,43 @@ export default {
         this.tableData = response;
         this.listLoading = false;
       });
+    },
+    handleMultipleDel() {
+      this.$confirm("此操作将永久删除该人员, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          const length = this.multipleSelection.length;
+          const multipleSelectionArr = [];
+          for (let i = 0; i < length; i++) {
+            // console.log("多选删除的index", this.multipleSelection[i].id);
+            multipleSelectionArr.push(this.multipleSelection[i].id);
+          }
+          // ----- 前端处理 ------
+          // multipleSelectionArr.forEach(id => {
+          //   this.list.forEach((item, index) => {
+          //     if(item.id == id){
+          //       this.list.splice(index,1)
+          //     }
+          //   })
+          // })
+
+          //----------------- 多选删除 传递id数组给后端进行操作 ------------
+          delList(multipleSelectionArr);
+          this.fetchData();
+          this.$message({
+            type: "success",
+            message: "删除成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
     },
     // 确定
     submitForm(formName, val) {

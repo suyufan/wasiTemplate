@@ -80,10 +80,10 @@
         >确定注册</el-button
       >
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right: 20px">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
     </el-form>
   </div>
 </template>
@@ -129,7 +129,7 @@ export default {
       redirect: undefined,
     };
   },
-  
+
   methods: {
     showPwd() {
       if (this.passwordType === "password") {
@@ -144,9 +144,9 @@ export default {
 
     handleRegister(data) {
       const keys = AES.generatekey(16);
-      const encrypts = AES.encrypt(data.password,'123456{saltZX}..');
+      const encrypts = AES.encrypt(data.password, "123456{saltZX}..");
       data.password = encrypts;
-      console.log("---handleRegister--data--",data);
+      console.log("---handleRegister--data--", data);
       register(data);
       this.$message({
         type: "success",
@@ -155,7 +155,7 @@ export default {
     },
 
     handleLogin() {
-      this.$router.push({ path: '/login' })
+      this.$router.push({ path: "/login" });
     },
   },
 };

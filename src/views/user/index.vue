@@ -97,6 +97,14 @@
             }}</el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="是/否采取应对措施" prop="do" align="center">
+        <template slot-scope="scope">
+          <el-select placeholder="请选择" v-model="scope.row.do" >
+            <el-option value="true" label="是"></el-option>
+            <el-option value="false" label="否"></el-option>
+          </el-select>
+        </template>
+      </el-table-column>
       </el-table>
     </el-row>
   </div>
